@@ -48,40 +48,40 @@ curl -X GET "http://localhost:8983/solr/admin/collections?action=CREATE&autoAddR
 *********
 
 
+Config Set erstellen/hochladen:
 
-
-
-Config Set erstellen:
 ```
-curl -X GET "http://localhost:8983/solr/admin/configs?action=CREATE&name=fubarConfigSet&baseConfigSet=_default"
+./server/scripts/cloud-scripts/zkcli.sh -zkhost localhost:9983 -cmd upconfig -confname addressConfigSet -confdir /Users/stefan/Projekte/solr-getting-started/configsets/address/conf/
 ```
 
-(Config Set löschen:)
+(oder mit REST-API:
 ```
-curl -X GET "http://localhost:8983/solr/admin/configs?action=DELETE&name=fubarConfigSet"
+zip -r - * > address.zip
+curl -X POST --header "Content-Type:application/octet-stream" --data-binary @address.zip "http://localhost:8983/solr/admin/configs?action=UPLOAD&name=addressConfigSet"
 ```
-
+)
 
 Collection erstellen:
 ```
-curl -X GET "http://localhost:8983/solr/admin/collections?action=CREATE&autoAddReplicas=false&collection.configName=fubarConfigSet&maxShardsPerNode=1&name=fubar&numShards=1&replicationFactor=1&router.name=compositeId&wt=json"
+curl -X GET "http://localhost:8983/solr/admin/collections?action=CREATE&autoAddReplicas=false&collection.configName=addressConfigSet&maxShardsPerNode=1&name=address&numShards=1&replicationFactor=1&router.name=compositeId&wt=json"
 ```
 
 (Collection löschen:)
 ```
-curl -X GET "http://localhost:8983/solr/admin/collections?action=DELETE&name=fubar&wt=xml"
+curl -X GET "http://localhost:8983/solr/admin/collections?action=DELETE&name=address&wt=xml"
 ```
 
 
 Disable "Data driven schema functionality":
 ```
-curl -X GET "http://localhost:8983/solr/fubar/config" -d '{"set-user-property": {"update.autoCreateFields":"false"}}'
+curl -X GET "http://localhost:8983/solr/address/config" -d '{"set-user-property": {"update.autoCreateFields":"false"}}'
 ```
 
 Schema mit verschiedenen Feldern erstellen:
 
 ```
 curl -X GET "http://localhost:8983/solr/fubar/schema?wt=json" -d '{add-field: {stored: "true", indexed: "true", name: "egid", type: "string"}}'
+curl -X GET "http://localhost:8983/solr/fubar/schema?wt=json" -d '{add-field: {stored: "true", indexed: "true", name: "gemeindename", type: "string"}}'
 curl -X GET "http://localhost:8983/solr/fubar/schema?wt=json" -d '{"add-field":{"stored":"true","indexed":"true","name":"full_address","type":"text_general","required":"true"}}'
 ```
 

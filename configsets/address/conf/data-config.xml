@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<dataConfig>
+  <dataSource type="JdbcDataSource" driver="org.postgresql.Driver" url="jdbc:postgresql://192.168.50.6:5432/pub" user="ddluser" password="ddluser"/>
+  <document>
+    <entity name="address" pk="id" query="SELECT t_id::text AS id, egid::text, gemeindename, strassenname || ' ' || hausnummer || ', ' || plz::text || ' ' || ortschaft AS full_address FROM agi_mopublic_pub.mopublic_gebaeudeadresse AS adr LEFT JOIN agi_mopublic_pub.mopublic_gemeindegrenze AS gem ON ST_Intersects(adr.lage, gem.geometrie);">
+      <field column="businessentityid" name="id"/>
+      <field column="firstname" name="firstname"/>
+      <field column="lastname" name="lastname"/>
+    </entity>
+  </document>
+</dataConfig>
