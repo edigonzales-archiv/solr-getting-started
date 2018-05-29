@@ -108,4 +108,5 @@ Suchen:
 
 ```
 curl -X GET "http://localhost:8983/solr/address/select?q=full_address:ob*+AND+full_address:gas*+AND+full_address:Eger*"
+curl -X GET "http://localhost:8983/solr/address/select?hl=on&hl.fl=full_address&q=full_address:ob*+AND+full_address:gas*+AND+full_address:Eger*"
 ```
