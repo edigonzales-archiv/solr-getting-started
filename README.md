@@ -71,6 +71,10 @@ curl -X GET "http://localhost:8983/solr/admin/collections?action=CREATE&autoAddR
 curl -X GET "http://localhost:8983/solr/admin/collections?action=DELETE&name=address&wt=xml"
 ```
 
+(Collection reload)
+```
+curl -X GET "http://localhost:8983/solr/admin/collections?action=RELOAD&name=address&wt=xml"
+```
 
 Disable "Data driven schema functionality":
 ```
@@ -80,8 +84,28 @@ curl -X GET "http://localhost:8983/solr/address/config" -d '{"set-user-property"
 Schema mit verschiedenen Feldern erstellen:
 
 ```
-curl -X GET "http://localhost:8983/solr/fubar/schema?wt=json" -d '{add-field: {stored: "true", indexed: "true", name: "egid", type: "string"}}'
-curl -X GET "http://localhost:8983/solr/fubar/schema?wt=json" -d '{add-field: {stored: "true", indexed: "true", name: "gemeindename", type: "string"}}'
-curl -X GET "http://localhost:8983/solr/fubar/schema?wt=json" -d '{"add-field":{"stored":"true","indexed":"true","name":"full_address","type":"text_general","required":"true"}}'
+curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{add-field: {stored: "true", indexed: "true", name: "egid", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field":{"stored":"true","indexed":"true","name":"full_address","type":"text_general","required":"true"}}'
 ```
 
+Daten importieren:
+
+```
+curl -X POST "http://localhost:8983/solr/address/dataimport?indent=on&wt=json" -d '{command=full-import&verbose=false&clean=true&commit=true&core=address&name=dataimport}'
+```
+
+Resultat:
+
+```
+Last Update: 20:16:13
+
+Indexing completed. Added/Updated: 102384 documents. Deleted 0 documents. (Duration: 05s)
+Requests: 1 , Fetched: 102,384 20,477/s, Skipped: 0 , Processed: 102,384 20,477/s
+Started: 2 minutes ago
+```
+
+Suchen:
+
+```
+curl -X GET "http://localhost:8983/solr/address/select?q=full_address:ob*+AND+full_address:gas*+AND+full_address:Eger*"
+```
