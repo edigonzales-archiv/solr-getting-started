@@ -37,7 +37,7 @@
                     if (searchTerms[i] == "") {
                         continue;
                     }
-                    solrQueryText += "full_address:"+searchTerms[i] + "*";
+                    solrQueryText += "full_address:*"+searchTerms[i] + "*";
                 }
                 //console.log(solrQueryText);
 
@@ -52,13 +52,16 @@
                         q : solrQueryText, start: 0, rows: 20, sort: "ortschaft asc,strassenname asc,hausnummer_prefix asc,hausnummer_appendix asc", fl: "*,score", hl: "on", "hl.fl" : "display_address", "hl.simple.pre": "<b>", "hl.simple.post": "</b>"
                     },
                     success: function(data) {
-                        //response($.map(data.response.docs, function(item) {
-                        response($.map(data.highlighting, function(item) {
+                        response($.map(data.response.docs, function(item) {
+                        //response($.map(data.highlighting, function(item) {
+                            var key = item.id;
+                            //console.log(key);
+                            //console.log(data.highlighting[key].display_address[0])
                             return {
-                                label: item.display_address[0],
-                                id: item.display_address[0]
-                                //label: display_address,
-                                //id: display_address
+                                label: data.highlighting[key].display_address[0],
+                                //id: item.display_address[0]
+                                //label: item.display_address,
+                                id: item.display_address
                             }
                         }));
                     },
@@ -67,6 +70,7 @@
             },
             minLength: 2
         })
+        // for highlighting
         .autocomplete( "instance" )._renderItem = function( ul, item ) {
             return $( "<li>" )
             .append( "<div>" + item.label + "</div>" )
@@ -79,8 +83,9 @@
 
 <br /><br />
 <div class="container" style="width:600px;">
-   <h2 align="center">Adresssuche</h2>
-   <br /><br />
+        <h2 align="center">Adresssuche:</h2>
+        <h3 align="center">FTS (&laquo;substring&raquo; - no fuzzy)</h3>
+        <br /><br />
    <div class="ui-widget">
    <!--<label>Search Address</label>-->
    <input type="text" name="address" id="address" class="form-control input-lg" autocomplete="off" placeholder="Type Address" />
