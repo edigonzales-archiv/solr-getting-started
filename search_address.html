@@ -1,0 +1,91 @@
+<html>
+<head>
+    <!--
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.16/jquery-ui.min.js"></script> 
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.16/themes/ui-lightness/jquery-ui.css" type="css">    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />  
+    -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />      
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>    
+</head>
+
+<body>
+<script>
+    $.curCSS = function (element, attrib, val) {
+        $(element).css(attrib, val);
+    };
+
+    $(function() {
+        $("#address").autocomplete({
+            source: function(request, response) {
+
+                var searchTerms = request.term.toLowerCase().trim().replace(",","").replace("."," ").replace("-"," ").split(" ");
+                //console.log(searchTerms);
+
+                var i;
+                var solrQueryText = "";
+                for (i = 0; i < searchTerms.length; i++) {
+                    if (i > 0) {
+                        //console.log("append AND");
+                        solrQueryText += " AND "
+                    }
+                     
+                    if (searchTerms[i] == "") {
+                        continue;
+                    }
+                    solrQueryText += "full_address:"+searchTerms[i] + "*";
+                }
+                //console.log(solrQueryText);
+
+                $.ajax({
+                    url: "http://localhost:8983/solr/address/select",
+                    type: "GET",
+                    crossDomain: true,
+                    dataType: 'jsonp',
+                    jsonp: 'json.wrf',
+                    contentType: "application/json",
+                    data: {
+                        q : solrQueryText, start: 0, rows: 20, sort: "ortschaft asc,strassenname asc,hausnummer_prefix asc,hausnummer_appendix asc", fl: "*,score", hl: "on", "hl.fl" : "display_address", "hl.simple.pre": "<b>", "hl.simple.post": "</b>"
+                    },
+                    success: function(data) {
+                        //response($.map(data.response.docs, function(item) {
+                        response($.map(data.highlighting, function(item) {
+                            return {
+                                label: item.display_address[0],
+                                id: item.display_address[0]
+                                //label: display_address,
+                                //id: display_address
+                            }
+                        }));
+                    },
+                });
+                
+            },
+            minLength: 2
+        })
+        .autocomplete( "instance" )._renderItem = function( ul, item ) {
+            return $( "<li>" )
+            .append( "<div>" + item.label + "</div>" )
+            .appendTo( ul );
+        };
+    });
+
+
+</script>
+
+<br /><br />
+<div class="container" style="width:600px;">
+   <h2 align="center">Adresssuche</h2>
+   <br /><br />
+   <div class="ui-widget">
+   <!--<label>Search Address</label>-->
+   <input type="text" name="address" id="address" class="form-control input-lg" autocomplete="off" placeholder="Type Address" />
+    </div>
+</div>
+
+</body>
+</html>

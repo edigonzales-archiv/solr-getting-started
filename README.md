@@ -84,14 +84,42 @@ curl -X GET "http://localhost:8983/solr/address/config" -d '{"set-user-property"
 Schema mit verschiedenen Feldern erstellen:
 
 ```
-curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{add-field: {stored: "true", indexed: "true", name: "egid", type: "string"}}'
-curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field":{"stored":"true","indexed":"true","name":"full_address","type":"text_general","required":"true"}}'
+curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "egid", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "strassenname", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "hausnummer", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "hausnummer_appendix", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "hausnummer_prefix", type: "pint"}}'
+curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "strassenname_hausnummer", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "ortschaft", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "gemeinde", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "false", name: "display_address", type: "text_general","required":"true","multiValued":"false"}}'
+curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field":{"stored":"true","indexed":"true","name":"full_address","type":"text_general","required":"true","multiValued":"false"}}'
+
+{"add-field":{"stored":"true","indexed":"true","name":"strassenname_hausnummer","type":"string","multiValued":"true","required":"true"}}
+{"add-copy-field":{"source":"strassenname","dest":"strassenname_hausnummer"}}
+{"add-copy-field":{"source":"hausnummer","dest":"strassenname_hausnummer"}}
 ```
+
+
+
+(Field löschen):
+```
+curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"delete-field":{"name":"full_address"}}'
+```
+
 
 Daten importieren:
 
+TEST!!!!
 ```
 curl -X POST "http://localhost:8983/solr/address/dataimport?indent=on&wt=json" -d '{command=full-import&verbose=false&clean=true&commit=true&core=address&name=dataimport}'
+```
+
+curl -X POST "http://localhost:8983/solr/address/dataimport?indent=on&wt=json" -d '{command:full-import&verbose=false&clean=true&commit=true&core=address&entity=address&name=dataimport}'
+
+Das geht?!
+```
+curl -X GET "http://localhost:8983/solr/address/dataimport?command=full-import&clean=true"
 ```
 
 Resultat:
@@ -107,6 +135,6 @@ Started: 2 minutes ago
 Suchen:
 
 ```
-curl -X GET "http://localhost:8983/solr/address/select?q=full_address:ob*+AND+full_address:gas*+AND+full_address:Eger*"
+curl -X GET "http://localhost:8983/solr/address/select?q=full_address:ob*+AND+full_address:gas*+AND+full_address:Eger*&start=0&rows=20&sort=full_address+asc"
 curl -X GET "http://localhost:8983/solr/address/select?hl=on&hl.fl=full_address&q=full_address:ob*+AND+full_address:gas*+AND+full_address:Eger*"
 ```
