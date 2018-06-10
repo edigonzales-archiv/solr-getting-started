@@ -94,10 +94,6 @@ curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field
 curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "gemeinde", type: "string"}}'
 curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "false", name: "display_address", type: "text_general","required":"true","multiValued":"false"}}'
 curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field":{"stored":"true","indexed":"true","name":"full_address","type":"text_general","required":"true","multiValued":"false"}}'
-
-{"add-field":{"stored":"true","indexed":"true","name":"strassenname_hausnummer","type":"string","multiValued":"true","required":"true"}}
-{"add-copy-field":{"source":"strassenname","dest":"strassenname_hausnummer"}}
-{"add-copy-field":{"source":"hausnummer","dest":"strassenname_hausnummer"}}
 ```
 
 
