@@ -46,7 +46,7 @@
                         //console.log("append AND");
                         solrQueryText += " AND "
                     }
-                    solrQueryText += "full_address:*"+searchTerms[i] + "*";
+                    solrQueryText += "full_address:"+searchTerms[i] + "*1";
                 }
                 //console.log(solrQueryText);
 
@@ -58,7 +58,7 @@
                     jsonp: 'json.wrf',
                     contentType: "application/json",
                     data: {
-                        q : solrQueryText, start: 0, rows: 20, sort: "ortschaft asc,strassenname asc,hausnummer_prefix asc,hausnummer_appendix asc", fl: "*,score", hl: "on", "hl.fl" : "display_address", "hl.simple.pre": "<b>", "hl.simple.post": "</b>"
+                        q : solrQueryText, start: 0, rows: 20, sort: "score desc, ortschaft asc,strassenname asc,hausnummer_prefix asc,hausnummer_appendix asc", fl: "*,score", hl: "on", "hl.fl" : "display_address", "hl.simple.pre": "<b>", "hl.simple.post": "</b>"
                     },
                     success: function(data) {
                         response($.map(data.response.docs, function(item) {
@@ -98,7 +98,7 @@
 <br /><br />
 <div class="container" style="width:600px;">
         <h2 align="center">Adresssuche:</h2>
-        <h3 align="center">FTS (&laquo;substring&raquo; - no fuzzy)</h3>
+        <h3 align="center">FTS (fuzzy: edit distance=1 / sort by score)</h3>
         <br /><br />
    <div class="ui-widget">
    <!--<label>Search Address</label>-->

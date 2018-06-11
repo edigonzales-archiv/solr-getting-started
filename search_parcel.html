@@ -22,23 +22,22 @@
     var projectionLV95 = ol.proj.get('EPSG:2056');
     projectionLV95.setExtent([2420000, 130000, 2900000, 1350000]);
 
-
-
     $.curCSS = function (element, attrib, val) {
         $(element).css(attrib, val);
     };
 
     $(function() {
-        $("#address").autocomplete({
+        $("#parcel").autocomplete({
             source: function(request, response) {
-                var searchTerms = request.term.toLowerCase().trim().replace(",","").replace("."," ").replace("-"," ").split(" ");
+                //var searchTerms = request.term.toLowerCase().trim().replace("/\,/g"," ").replace("/\./g"," ").replace("/-/g"," ").replace("/\(/g"," ").replace(")"," ").split(" ");
+                var searchTerms = request.term.toLowerCase().trim().replace(/\W+/g, ' ').split(" ");
                 //console.log(searchTerms);
 
                 var i;
                 var solrQueryText = "";
                 for (i = 0; i < searchTerms.length; i++) {
                     if (searchTerms[i] == "") {
-                        console.log("empty string");
+                        //console.log("empty string");
                         continue;
                     }
 
@@ -46,31 +45,31 @@
                         //console.log("append AND");
                         solrQueryText += " AND "
                     }
-                    solrQueryText += "full_address:*"+searchTerms[i] + "*";
+                    solrQueryText += "full_parcel:*"+searchTerms[i] + "*";
                 }
                 //console.log(solrQueryText);
 
                 $.ajax({
-                    url: "http://localhost:8983/solr/address/select",
+                    url: "http://localhost:8983/solr/parcel/select",
                     type: "GET",
                     crossDomain: true,
                     dataType: 'jsonp',
                     jsonp: 'json.wrf',
                     contentType: "application/json",
                     data: {
-                        q : solrQueryText, start: 0, rows: 20, sort: "ortschaft asc,strassenname asc,hausnummer_prefix asc,hausnummer_appendix asc", fl: "*,score", hl: "on", "hl.fl" : "display_address", "hl.simple.pre": "<b>", "hl.simple.post": "</b>"
+                        q : solrQueryText, start: 0, rows: 20, sort: "gemeindename asc, nummer_sort asc", fl: "*,score", hl: "on", "hl.fl" : "display_parcel", "hl.simple.pre": "<b>", "hl.simple.post": "</b>"
                     },
                     success: function(data) {
                         response($.map(data.response.docs, function(item) {
                         //response($.map(data.highlighting, function(item) {
                             var key = item.id;
                             //console.log(key);
-                            //console.log(data.highlighting[key].display_address[0])
+                            //console.log(data.highlighting[key].display_parcel[0])
                             return {
-                                label: data.highlighting[key].display_address[0],
-                                //id: item.display_address[0]
-                                //label: item.display_address,
-                                id: item.display_address
+                                label: data.highlighting[key].display_parcel[0],
+                                //id: item.display_parcel[0]
+                                //label: item.display_parcel,
+                                id: item.display_parcel
                             }
                         }));
                     },
@@ -80,7 +79,7 @@
             select: function( event, ui ) {
                 var displayText = ui.item.value.replace(/(&nbsp;|<([^>]+)>)/ig,'');
                 //console.log(displayText);
-                $( "#address" ).val( displayText );
+                $( "#parcel" ).val( displayText );
                 return false;
             }            
         })
@@ -97,12 +96,14 @@
 
 <br /><br />
 <div class="container" style="width:600px;">
-        <h2 align="center">Adresssuche:</h2>
+        <h2 align="center">Grundstückssuche:</h2>
         <h3 align="center">FTS (&laquo;substring&raquo; - no fuzzy)</h3>
+        <div align="left"><span style="font-family:monospace;">Grundbuchkreis</span>-Attribut fehlt. Im Suchresultat wird in Klammer der verkürzte NBIdent angezeigt. Diese ist aber nicht suchbar (im Gegensatz zum GB-Kreis, wenn er vorhanden sein wird). <br>
+        Eventuell noch der (SO)-Zusatz entfernen im Gemeindenamen. Ansonsten hat es unter Umständen sehr viele Klammern...</div>
         <br /><br />
    <div class="ui-widget">
-   <!--<label>Search Address</label>-->
-   <input type="text" name="address" id="address" class="form-control input-lg" autocomplete="off" placeholder="Type Address" />
+   <!--<label>Search Parcel</label>-->
+   <input type="text" name="parcel" id="parcel" class="form-control input-lg" autocomplete="off" placeholder="Type Parcel" />
     </div>
 </div>
 

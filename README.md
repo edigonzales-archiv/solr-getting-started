@@ -96,8 +96,6 @@ curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field
 curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"add-field":{"stored":"true","indexed":"true","name":"full_address","type":"text_general","required":"true","multiValued":"false"}}'
 ```
 
-
-
 (Field löschen):
 ```
 curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"delete-field":{"name":"full_address"}}'
@@ -106,7 +104,7 @@ curl -X POST "http://localhost:8983/solr/address/schema?wt=json" -d '{"delete-fi
 
 Daten importieren:
 
-TEST!!!!
+**TEST!!!!**
 ```
 curl -X POST "http://localhost:8983/solr/address/dataimport?indent=on&wt=json" -d '{command=full-import&verbose=false&clean=true&commit=true&core=address&name=dataimport}'
 ```
@@ -134,3 +132,22 @@ Suchen:
 curl -X GET "http://localhost:8983/solr/address/select?q=full_address:ob*+AND+full_address:gas*+AND+full_address:Eger*&start=0&rows=20&sort=full_address+asc"
 curl -X GET "http://localhost:8983/solr/address/select?hl=on&hl.fl=full_address&q=full_address:ob*+AND+full_address:gas*+AND+full_address:Eger*"
 ```
+
+
+### Grundstücke
+
+./server/scripts/cloud-scripts/zkcli.sh -zkhost localhost:9983 -cmd upconfig -confname parcelConfigSet -confdir /Users/stefan/Projekte/solr-getting-started/configsets/parcel/conf/
+
+curl -X GET "http://localhost:8983/solr/admin/collections?action=CREATE&autoAddReplicas=false&collection.configName=parcelConfigSet&maxShardsPerNode=1&name=parcel&numShards=1&replicationFactor=1&router.name=compositeId&wt=json"
+
+curl -X GET "http://localhost:8983/solr/parcel/config" -d '{"set-user-property": {"update.autoCreateFields":"false"}}'
+
+curl -X POST "http://localhost:8983/solr/parcel/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "nbident", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/parcel/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "nummer", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/parcel/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "nummer_sort", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/parcel/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "egrid", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/parcel/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "art_txt", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/parcel/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "gemeindename", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/parcel/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "true", name: "grundbuchkreis", type: "string"}}'
+curl -X POST "http://localhost:8983/solr/parcel/schema?wt=json" -d '{"add-field": {stored: "true", indexed: "false", name: "display_parcel", type: "text_general","required":"true","multiValued":"false"}}'
+curl -X POST "http://localhost:8983/solr/parcel/schema?wt=json" -d '{"add-field":{"stored":"true","indexed":"true","name":"full_parcel","type":"text_general","required":"true","multiValued":"false"}}'

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<dataConfig>
+  <dataSource type="JdbcDataSource" driver="org.postgresql.Driver" url="jdbc:postgresql://192.168.50.6:5432/pub" user="ddluser" password="ddluser"/>
+  <document>
+    <entity name="parcel" pk="id" query="SELECT grundstueck.t_id AS id, nbident, nummer, lpad(nummer,10,'0') AS nummer_sort, egrid, (regexp_split_to_array(art_txt, '\.'))[array_upper(regexp_split_to_array(art_txt, '\.'), 1)] AS art_txt, gemeindename, 'fubar' AS grundbuchkreis, CASE WHEN gemeindegrenze.bfs_nr = substring(nbident,9,4)::int THEN gemeindename || ', GB-Nr. ' || nummer || ' (' || (regexp_split_to_array(art_txt, '\.'))[array_upper(regexp_split_to_array(art_txt, '\.'), 1)] || ')' ELSE gemeindename || ' ('|| substring(nbident,9,4) ||'), GB-Nr. ' || nummer || ' (' || (regexp_split_to_array(art_txt, '\.'))[array_upper(regexp_split_to_array(art_txt, '\.'), 1)] || ')' END AS display_parcel, gemeindename || ' GB Nr ' || nummer || ' ' || (regexp_split_to_array(art_txt, '\.'))[array_upper(regexp_split_to_array(art_txt, '\.'), 1)] AS full_parcel FROM agi_mopublic_pub.mopublic_grundstueck AS grundstueck LEFT JOIN agi_mopublic_pub.mopublic_gemeindegrenze AS gemeindegrenze ON grundstueck.bfs_nr = gemeindegrenze.bfs_nr UNION ALL SELECT grundstueck.t_id AS id, nbident, nummer, lpad(nummer,10,'0') AS nummer_sort, egrid, (regexp_split_to_array(art_txt, '\.'))[array_upper(regexp_split_to_array(art_txt, '\.'), 1)] AS art_txt, gemeindename, 'fubar' AS grundbuchkreis, CASE WHEN gemeindegrenze.bfs_nr = substring(nbident,9,4)::int THEN gemeindename || ', GB-Nr. ' || nummer || ' (' || (regexp_split_to_array(art_txt, '\.'))[array_upper(regexp_split_to_array(art_txt, '\.'), 1)] || ' projektiert)' ELSE gemeindename || ' ('|| substring(nbident,9,4) ||'), GB-Nr. ' || nummer || ' (' || (regexp_split_to_array(art_txt, '\.'))[array_upper(regexp_split_to_array(art_txt, '\.'), 1)] || ' projektiert)' END AS display_parcel, gemeindename || ' GB Nr ' || nummer || ' ' || (regexp_split_to_array(art_txt, '\.'))[array_upper(regexp_split_to_array(art_txt, '\.'), 1)] || ' projektiert' AS full_parcel FROM agi_mopublic_pub.mopublic_grundstueck_proj AS grundstueck LEFT JOIN agi_mopublic_pub.mopublic_gemeindegrenze AS gemeindegrenze ON grundstueck.bfs_nr = gemeindegrenze.bfs_nr;">
+      <field column="id" name="id"/>
+      <field column="nbident" name="nbident"/>
+      <field column="nummer" name="nummer"/>
+      <field column="nummer_sort" name="nummer_sort"/>
+      <field column="egrid" name="egrid"/>
+      <field column="art_txt" name="art_txt"/>
+      <field column="gemeindename" name="gemeindename"/>
+      <field column="grundbuchkreis" name="grundbuchkreis"/>
+      <field column="display_parcel" name="display_parcel"/>
+      <field column="full_parcel" name="full_parcel"/>
+    </entity>
+  </document>
+</dataConfig>
