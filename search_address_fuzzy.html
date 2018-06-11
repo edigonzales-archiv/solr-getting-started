@@ -46,7 +46,7 @@
                         //console.log("append AND");
                         solrQueryText += " AND "
                     }
-                    solrQueryText += "full_address:"+searchTerms[i] + "*1";
+                    solrQueryText += "full_address:"+searchTerms[i] + "~1";
                 }
                 //console.log(solrQueryText);
 
