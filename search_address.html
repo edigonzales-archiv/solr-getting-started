@@ -10,11 +10,20 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />      
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>    
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.4.4/proj4-src.js"></script>  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.js"></script>  
 </head>
 
 <body>
 <script>
+    proj4.defs('EPSG:2056', "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs");
+
+    var projectionLV95 = ol.proj.get('EPSG:2056');
+    projectionLV95.setExtent([2420000, 130000, 2900000, 1350000]);
+
+
+
     $.curCSS = function (element, attrib, val) {
         $(element).css(attrib, val);
     };
@@ -22,20 +31,20 @@
     $(function() {
         $("#address").autocomplete({
             source: function(request, response) {
-
                 var searchTerms = request.term.toLowerCase().trim().replace(",","").replace("."," ").replace("-"," ").split(" ");
                 //console.log(searchTerms);
 
                 var i;
                 var solrQueryText = "";
                 for (i = 0; i < searchTerms.length; i++) {
+                    if (searchTerms[i] == "") {
+                        console.log("empty string");
+                        continue;
+                    }
+
                     if (i > 0) {
                         //console.log("append AND");
                         solrQueryText += " AND "
-                    }
-                     
-                    if (searchTerms[i] == "") {
-                        continue;
                     }
                     solrQueryText += "full_address:*"+searchTerms[i] + "*";
                 }
