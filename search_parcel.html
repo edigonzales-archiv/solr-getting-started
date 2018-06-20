@@ -7,12 +7,23 @@
     <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.16/themes/ui-lightness/jquery-ui.css" type="css">    
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />  
     -->
+    <meta charset="utf-8">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />      
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>   
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.4.4/proj4-src.js"></script>  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.js"></script>  
+
+    <style>
+        .highlight {background-color: #FFD9BD;}
+        .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-state-active.ui-button:hover 
+        {
+            color: white;
+            border: 1px solid #999999;
+            background: #999999;
+        }    
+    </style>                
 </head>
 
 <body>
@@ -29,8 +40,7 @@
     $(function() {
         $("#parcel").autocomplete({
             source: function(request, response) {
-                //var searchTerms = request.term.toLowerCase().trim().replace("/\,/g"," ").replace("/\./g"," ").replace("/-/g"," ").replace("/\(/g"," ").replace(")"," ").split(" ");
-                var searchTerms = request.term.toLowerCase().trim().replace(/\W+/g, ' ').split(" ");
+                var searchTerms = request.term.toLowerCase().trim().replace(/[^a-zA-Z0-9äöüÄÖÜ]/g, ' ').split(" ");
                 //console.log(searchTerms);
 
                 var i;
@@ -81,12 +91,31 @@
                 //console.log(displayText);
                 $( "#parcel" ).val( displayText );
                 return false;
+            },
+            focus: function( event, ui ) {
+                return false;
             }            
         })
         // for highlighting
         .autocomplete( "instance" )._renderItem = function( ul, item ) {
+            var element = item.label;
+            var searchTerms = $("#parcel").val().toLowerCase().trim().replace(/[^a-zA-Z0-9äöüÄÖÜ]/g, ' ').split(" ");
+
+            var uniqueSearchTerms = searchTerms.filter(function(elem, index, self) {
+                return index === self.indexOf(elem);
+            })
+            for (i = 0; i < uniqueSearchTerms.length; i++) {
+                if (uniqueSearchTerms[i] == "") {
+                    continue;
+                }
+                var find = uniqueSearchTerms[i];
+                var regex = new RegExp(find, "gi");
+                element = element.replace(regex, function(match) {
+                    return '<span class="highlight">' + match + '</span>'
+                });
+            }
             return $( "<li>" )
-            .append( "<div>" + item.label + "</div>" )
+            .append( "<div>" + element + "</div>" )
             .appendTo( ul );
         };
     });
@@ -98,7 +127,7 @@
 <div class="container" style="width:600px;">
         <h2 align="center">Grundstückssuche:</h2>
         <h3 align="center">FTS (&laquo;substring&raquo; - no fuzzy)</h3>
-        <div align="left"><span style="font-family:monospace;">Grundbuchkreis</span>-Attribut fehlt. Im Suchresultat wird in Klammer der verkürzte NBIdent angezeigt. Diese ist aber nicht suchbar (im Gegensatz zum GB-Kreis, wenn er vorhanden sein wird). <br>
+        <div align="left"><span style="font-family:monospace;">Grundbuchkreis</span>-Attribut fehlt. Im Suchresultat wird in Klammer der verkürzte NBIdent angezeigt. Diese ist aber nicht suchbar (im Gegensatz zum GB-Kreis, wenn er vorhanden sein wird). ACHTUNG: Das führt dazu, dass ein solches Resultat nicht mehr zu Vorschlägen führt.<br>
         Eventuell noch der (SO)-Zusatz entfernen im Gemeindenamen. Ansonsten hat es unter Umständen sehr viele Klammern...</div>
         <br /><br />
    <div class="ui-widget">
